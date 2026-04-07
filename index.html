@@ -7,540 +7,128 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
   :root {
-    --bg: #0f0e17;
-    --surface: #1a1828;
-    --card: #232136;
-    --accent: #ff6b6b;
-    --accent2: #ffd93d;
-    --accent3: #6bcb77;
-    --accent4: #4d96ff;
-    --text: #fffffe;
-    --muted: #a7a9be;
-    --border: rgba(255,255,255,0.08);
-    --correct: #6bcb77;
-    --wrong: #ff6b6b;
-    --glow: rgba(255,107,107,0.3);
+    --bg: #0f0e17; --surface: #1a1828; --card: #232136;
+    --accent: #ff6b6b; --accent2: #ffd93d; --accent3: #6bcb77; --accent4: #4d96ff;
+    --text: #fffffe; --muted: #a7a9be; --border: rgba(255,255,255,0.08);
+    --correct: #6bcb77; --wrong: #ff6b6b; --glow: rgba(255,107,107,0.3);
   }
-
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow-x: hidden;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 480px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    position: relative;
-  }
-
-  /* ===== SCREENS ===== */
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+  .container { width: 100%; max-width: 480px; min-height: 100vh; display: flex; flex-direction: column; }
   .screen { display: none; flex-direction: column; align-items: center; width: 100%; min-height: 100vh; }
   .screen.active { display: flex; }
-
-  /* ===== INTRO ===== */
-  #intro {
-    justify-content: center;
-    padding: 2rem 1.5rem;
-    background: radial-gradient(ellipse at top, #2d1b69 0%, #0f0e17 60%);
-  }
-
-  .logo-area { text-align: center; margin-bottom: 2rem; }
+  #intro { justify-content: center; padding: 2rem 1.5rem; background: radial-gradient(ellipse at top, #2d1b69 0%, #0f0e17 60%); }
   .logo-emoji { font-size: 5rem; display: block; animation: float 3s ease-in-out infinite; }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-
-  .game-title {
-    font-family: 'Jua', cursive;
-    font-size: 2.8rem;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 2px;
-    margin-top: 0.5rem;
-  }
-
-  .tagline { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
-
-  .stats-row {
-    display: flex; gap: 1rem; margin: 2rem 0; width: 100%;
-  }
-
-  .stat-card {
-    flex: 1;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1rem;
-    text-align: center;
-  }
-
+  .game-title { font-family: 'Jua', cursive; font-size: 2.8rem; background: linear-gradient(135deg, var(--accent2), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; margin-top: 0.5rem; }
+  .tagline { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; margin-bottom: 2rem; }
+  .stats-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; width: 100%; }
+  .stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1rem; text-align: center; }
   .stat-num { font-family: 'Jua', cursive; font-size: 1.8rem; color: var(--accent2); }
   .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-
-  .category-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    width: 100%;
-    margin-bottom: 2rem;
-  }
-
-  .cat-btn {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    padding: 1rem 0.75rem;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    color: var(--text);
-  }
-
-  .cat-btn:hover, .cat-btn.selected {
-    border-color: var(--accent2);
-    background: rgba(255,217,61,0.1);
-    transform: scale(1.03);
-  }
-
+  .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; margin-bottom: 2rem; }
+  .cat-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.2s; color: var(--text); }
+  .cat-btn.selected { border-color: var(--accent2); background: rgba(255,217,61,0.1); transform: scale(1.03); }
   .cat-icon { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
   .cat-name { font-size: 0.85rem; font-weight: 700; }
-
-  .start-btn {
-    width: 100%;
-    padding: 1.1rem;
-    background: linear-gradient(135deg, var(--accent), #ff4757);
-    border: none;
-    border-radius: 16px;
-    color: white;
-    font-family: 'Jua', cursive;
-    font-size: 1.3rem;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-    box-shadow: 0 4px 20px var(--glow);
-  }
-
+  .cat-count { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .start-btn { width: 100%; padding: 1.1rem; background: linear-gradient(135deg, var(--accent), #ff4757); border: none; border-radius: 16px; color: white; font-family: 'Jua', cursive; font-size: 1.3rem; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 20px var(--glow); transition: all 0.2s; }
   .start-btn:active { transform: scale(0.97); }
-  .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* ===== LOADING ===== */
-  #loading {
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-    background: var(--bg);
-  }
-
-  .loader-emoji { font-size: 4rem; animation: spin 1s linear infinite; }
-  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-
-  .loader-text { font-family: 'Jua', cursive; font-size: 1.3rem; color: var(--accent2); text-align: center; }
-  .loader-sub { color: var(--muted); font-size: 0.85rem; text-align: center; }
-
-  /* ===== GAME ===== */
-  #game {
-    justify-content: flex-start;
-    padding: 0;
-  }
-
-  .game-header {
-    width: 100%;
-    padding: 1rem 1.25rem 0.75rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 10;
-  }
-
-  .progress-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.6rem;
-  }
-
+  #game { justify-content: flex-start; }
+  .game-header { width: 100%; padding: 1rem 1.25rem 0.75rem; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
   .q-counter { font-family: 'Jua', cursive; font-size: 1rem; color: var(--muted); }
-  .score-badge {
-    font-family: 'Jua', cursive;
-    font-size: 1rem;
-    background: var(--card);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    color: var(--accent2);
-    border: 1px solid var(--border);
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 6px;
-    background: var(--border);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 99px;
-    transition: width 0.4s ease;
-  }
-
-  .timer-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  .timer-bar {
-    flex: 1;
-    height: 4px;
-    background: var(--border);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .timer-fill {
-    height: 100%;
-    background: var(--accent3);
-    border-radius: 99px;
-    transition: width 1s linear, background 1s;
-  }
-
+  .score-badge { font-family: 'Jua', cursive; font-size: 1rem; background: var(--card); padding: 0.25rem 0.75rem; border-radius: 20px; color: var(--accent2); border: 1px solid var(--border); }
+  .progress-bar { width: 100%; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.4s ease; }
+  .timer-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+  .timer-bar { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .timer-fill { height: 100%; background: var(--accent3); border-radius: 99px; transition: width 1s linear, background 1s; }
   .timer-fill.warn { background: var(--accent2); }
   .timer-fill.danger { background: var(--accent); }
-
-  .timer-num {
-    font-family: 'Jua', cursive;
-    font-size: 0.9rem;
-    min-width: 28px;
-    text-align: right;
-    color: var(--muted);
-  }
-
-  .question-area {
-    width: 100%;
-    padding: 1.5rem 1.25rem 1rem;
-  }
-
-  .q-category-tag {
-    display: inline-block;
-    font-size: 0.75rem;
-    background: rgba(77,150,255,0.15);
-    color: var(--accent4);
-    border: 1px solid rgba(77,150,255,0.3);
-    border-radius: 20px;
-    padding: 0.2rem 0.7rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .question-text {
-    font-size: 1.15rem;
-    font-weight: 700;
-    line-height: 1.6;
-    color: var(--text);
-  }
-
-  .options-area {
-    width: 100%;
-    padding: 0 1.25rem 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .option-btn {
-    width: 100%;
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 1rem 1.1rem;
-    cursor: pointer;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    transition: all 0.15s;
-    color: var(--text);
-    font-size: 1rem;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-
-  .option-btn:active:not(:disabled) { transform: scale(0.98); }
+  .timer-num { font-family: 'Jua', cursive; font-size: 0.9rem; min-width: 28px; text-align: right; color: var(--muted); }
+  .question-area { width: 100%; padding: 1.5rem 1.25rem 1rem; }
+  .q-category-tag { display: inline-block; font-size: 0.75rem; background: rgba(77,150,255,0.15); color: var(--accent4); border: 1px solid rgba(77,150,255,0.3); border-radius: 20px; padding: 0.2rem 0.7rem; margin-bottom: 0.75rem; }
+  .question-text { font-size: 1.15rem; font-weight: 700; line-height: 1.6; color: var(--text); }
+  .options-area { width: 100%; padding: 0 1.25rem 2rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .option-btn { width: 100%; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 0.85rem; transition: all 0.15s; color: var(--text); font-size: 1rem; font-family: 'Noto Sans KR', sans-serif; }
   .option-btn:disabled { cursor: default; }
-
-  .option-num {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Jua', cursive;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-    transition: all 0.15s;
-  }
-
-  .option-btn.selected { border-color: var(--accent4); background: rgba(77,150,255,0.1); }
-  .option-btn.selected .option-num { background: var(--accent4); border-color: var(--accent4); color: white; }
-
+  .option-num { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Jua', cursive; font-size: 0.9rem; flex-shrink: 0; }
   .option-btn.correct { border-color: var(--correct); background: rgba(107,203,119,0.12); }
-  .option-btn.correct .option-num { background: var(--correct); border-color: var(--correct); color: white; }
-
+  .option-btn.correct .option-num { background: var(--correct); border-color: var(--correct); color: #0f0e17; }
   .option-btn.wrong { border-color: var(--wrong); background: rgba(255,107,107,0.1); }
   .option-btn.wrong .option-num { background: var(--wrong); border-color: var(--wrong); color: white; }
-
-  /* ===== FEEDBACK ===== */
-  .feedback-bar {
-    width: 100%;
-    padding: 1rem 1.25rem;
-    border-radius: 0;
-    display: none;
-    align-items: flex-start;
-    gap: 0.75rem;
-    animation: slideUp 0.3s ease;
-    flex-direction: column;
-  }
-
+  .feedback-bar { width: 100%; padding: 1rem 1.25rem; display: none; flex-direction: column; gap: 0.6rem; animation: slideUp 0.3s ease; }
   @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
   .feedback-bar.correct-fb { background: rgba(107,203,119,0.12); border-top: 2px solid var(--correct); }
   .feedback-bar.wrong-fb { background: rgba(255,107,107,0.1); border-top: 2px solid var(--wrong); }
-
   .feedback-top { display: flex; align-items: center; gap: 0.5rem; }
-  .feedback-icon { font-size: 1.4rem; }
   .feedback-title { font-family: 'Jua', cursive; font-size: 1.1rem; }
   .feedback-bar.correct-fb .feedback-title { color: var(--correct); }
   .feedback-bar.wrong-fb .feedback-title { color: var(--wrong); }
-
   .feedback-explain { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
-
-  .next-btn {
-    width: 100%;
-    padding: 1rem;
-    background: var(--accent4);
-    border: none;
-    border-radius: 14px;
-    color: white;
-    font-family: 'Jua', cursive;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: opacity 0.2s;
-  }
-
+  .next-btn { width: 100%; padding: 1rem; background: var(--accent4); border: none; border-radius: 14px; color: white; font-family: 'Jua', cursive; font-size: 1.1rem; cursor: pointer; margin-top: 0.25rem; }
   .next-btn:active { opacity: 0.8; }
-
-  /* ===== RESULT ===== */
-  #result {
-    justify-content: center;
-    align-items: center;
-    padding: 2rem 1.5rem;
-    background: radial-gradient(ellipse at center, #1a1030 0%, #0f0e17 60%);
-  }
-
+  #result { justify-content: center; align-items: center; padding: 2rem 1.5rem; background: radial-gradient(ellipse at center, #1a1030 0%, #0f0e17 60%); }
   .result-emoji { font-size: 5rem; margin-bottom: 1rem; animation: bounce 0.5s ease; }
   @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
-
   .result-title { font-family: 'Jua', cursive; font-size: 2rem; margin-bottom: 0.25rem; }
-  .result-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
-
-  .score-circle {
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: conic-gradient(var(--accent2) calc(var(--pct)*1%), var(--card) 0);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 2rem;
-    position: relative;
-  }
-
-  .score-inner {
-    width: 110px; height: 110px;
-    border-radius: 50%;
-    background: var(--bg);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-
+  .result-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .grade-badge { font-family: 'Jua', cursive; font-size: 1rem; padding: 0.4rem 1.2rem; border-radius: 20px; margin-bottom: 1.5rem; }
+  .score-circle { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(var(--accent2) calc(var(--pct)*1%), var(--card) 0); display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; }
+  .score-inner { width: 110px; height: 110px; border-radius: 50%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .score-big { font-family: 'Jua', cursive; font-size: 2rem; color: var(--accent2); }
   .score-total { font-size: 0.75rem; color: var(--muted); }
-
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.75rem;
-    width: 100%;
-    margin-bottom: 2rem;
-  }
-
-  .result-stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 0.85rem 0.5rem;
-    text-align: center;
-  }
-
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; width: 100%; margin-bottom: 2rem; }
+  .result-stat { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 0.85rem 0.5rem; text-align: center; }
   .result-stat-num { font-family: 'Jua', cursive; font-size: 1.5rem; }
   .result-stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
-
-  .result-correct .result-stat-num { color: var(--correct); }
-  .result-wrong .result-stat-num { color: var(--wrong); }
-  .result-time .result-stat-num { color: var(--accent4); }
-
-  .retry-btn {
-    width: 100%;
-    padding: 1.1rem;
-    background: linear-gradient(135deg, var(--accent), #ff4757);
-    border: none;
-    border-radius: 16px;
-    color: white;
-    font-family: 'Jua', cursive;
-    font-size: 1.3rem;
-    cursor: pointer;
-    box-shadow: 0 4px 20px var(--glow);
-    margin-bottom: 0.75rem;
-    transition: all 0.2s;
-  }
-
+  .rc .result-stat-num { color: var(--correct); }
+  .rw .result-stat-num { color: var(--wrong); }
+  .rt .result-stat-num { color: var(--accent4); }
+  .retry-btn { width: 100%; padding: 1.1rem; background: linear-gradient(135deg, var(--accent), #ff4757); border: none; border-radius: 16px; color: white; font-family: 'Jua', cursive; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 20px var(--glow); margin-bottom: 0.75rem; }
   .retry-btn:active { transform: scale(0.97); }
-
-  .share-btn {
-    width: 100%;
-    padding: 1rem;
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    color: var(--text);
-    font-family: 'Jua', cursive;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .grade-badge {
-    font-family: 'Jua', cursive;
-    font-size: 1rem;
-    padding: 0.4rem 1.2rem;
-    border-radius: 20px;
-    margin-bottom: 1.5rem;
-  }
-
-  .error-box {
-    background: rgba(255,107,107,0.1);
-    border: 1px solid var(--wrong);
-    border-radius: 14px;
-    padding: 1rem;
-    color: var(--muted);
-    font-size: 0.85rem;
-    text-align: center;
-    margin: 1rem 0;
-    width: 100%;
-  }
+  .share-btn { width: 100%; padding: 1rem; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; color: var(--text); font-family: 'Jua', cursive; font-size: 1rem; cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="container">
-
-  <!-- ===== INTRO ===== -->
   <div id="intro" class="screen active">
-    <div class="logo-area">
+    <div style="text-align:center;margin-bottom:2rem;">
       <span class="logo-emoji">🧠</span>
       <div class="game-title">브레인 퀴즈</div>
-      <div class="tagline">AI가 만드는 나만의 퀴즈 도전!</div>
+      <div class="tagline">매번 새로운 랜덤 문제 도전!</div>
     </div>
-
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-num">10</div>
-        <div class="stat-label">문제 수</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">20</div>
-        <div class="stat-label">초 / 문제</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">4지</div>
-        <div class="stat-label">선다형</div>
-      </div>
+      <div class="stat-card"><div class="stat-num">10</div><div class="stat-label">문제 수</div></div>
+      <div class="stat-card"><div class="stat-num">20</div><div class="stat-label">초 / 문제</div></div>
+      <div class="stat-card"><div class="stat-num">4지</div><div class="stat-label">선다형</div></div>
     </div>
-
     <div style="width:100%;margin-bottom:0.75rem;font-family:'Jua',cursive;font-size:0.9rem;color:var(--muted);">카테고리 선택</div>
-    <div class="category-grid">
-      <button class="cat-btn selected" data-cat="일반상식" onclick="selectCat(this)">
-        <span class="cat-icon">🌍</span>
-        <span class="cat-name">일반상식</span>
-      </button>
-      <button class="cat-btn" data-cat="과학" onclick="selectCat(this)">
-        <span class="cat-icon">🔬</span>
-        <span class="cat-name">과학</span>
-      </button>
-      <button class="cat-btn" data-cat="역사" onclick="selectCat(this)">
-        <span class="cat-icon">🏛️</span>
-        <span class="cat-name">역사</span>
-      </button>
-      <button class="cat-btn" data-cat="스포츠" onclick="selectCat(this)">
-        <span class="cat-icon">⚽</span>
-        <span class="cat-name">스포츠</span>
-      </button>
-      <button class="cat-btn" data-cat="음식" onclick="selectCat(this)">
-        <span class="cat-icon">🍜</span>
-        <span class="cat-name">음식/문화</span>
-      </button>
-      <button class="cat-btn" data-cat="지리" onclick="selectCat(this)">
-        <span class="cat-icon">🗺️</span>
-        <span class="cat-name">지리</span>
-      </button>
-    </div>
-
-    <button class="start-btn" id="startBtn" onclick="startGame()">게임 시작하기 🚀</button>
+    <div class="category-grid" id="catGrid"></div>
+    <button class="start-btn" onclick="startGame()">게임 시작하기 🚀</button>
   </div>
 
-  <!-- ===== LOADING ===== -->
-  <div id="loading" class="screen">
-    <div class="loader-emoji">⚙️</div>
-    <div class="loader-text">AI가 퀴즈를 만들고 있어요!</div>
-    <div class="loader-sub">Claude가 열심히 문제를 생성 중...</div>
-  </div>
-
-  <!-- ===== GAME ===== -->
   <div id="game" class="screen">
     <div class="game-header">
       <div class="progress-row">
         <div class="q-counter" id="qCounter">1 / 10</div>
         <div class="score-badge">⭐ <span id="scoreDisplay">0</span>점</div>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="width:10%"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:10%"></div></div>
       <div class="timer-row">
-        <div class="timer-bar">
-          <div class="timer-fill" id="timerFill"></div>
-        </div>
+        <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
         <div class="timer-num" id="timerNum">20</div>
       </div>
     </div>
-
     <div class="question-area">
-      <div class="q-category-tag" id="qCatTag">일반상식</div>
-      <div class="question-text" id="questionText">문제를 불러오는 중...</div>
+      <div class="q-category-tag" id="qCatTag"></div>
+      <div class="question-text" id="questionText"></div>
     </div>
-
     <div class="options-area" id="optionsArea"></div>
-
     <div class="feedback-bar" id="feedbackBar">
       <div class="feedback-top">
-        <span class="feedback-icon" id="feedbackIcon"></span>
+        <span style="font-size:1.4rem" id="feedbackIcon"></span>
         <span class="feedback-title" id="feedbackTitle"></span>
       </div>
       <div class="feedback-explain" id="feedbackExplain"></div>
@@ -548,296 +136,260 @@
     </div>
   </div>
 
-  <!-- ===== RESULT ===== -->
   <div id="result" class="screen">
     <div class="result-emoji" id="resultEmoji">🎉</div>
     <div class="result-title" id="resultTitle">퀴즈 완료!</div>
-    <div class="result-sub" id="resultSub">결과를 확인해보세요</div>
-
+    <div class="result-sub" id="resultSub"></div>
     <div class="grade-badge" id="gradeBadge"></div>
-
     <div class="score-circle" id="scoreCircle">
       <div class="score-inner">
         <div class="score-big" id="finalScore">0</div>
         <div class="score-total">/ 1000점</div>
       </div>
     </div>
-
     <div class="result-grid">
-      <div class="result-stat result-correct">
-        <div class="result-stat-num" id="correctCount">0</div>
-        <div class="result-stat-label">정답</div>
-      </div>
-      <div class="result-stat result-wrong">
-        <div class="result-stat-num" id="wrongCount">0</div>
-        <div class="result-stat-label">오답</div>
-      </div>
-      <div class="result-stat result-time">
-        <div class="result-stat-num" id="avgTime">0s</div>
-        <div class="result-stat-label">평균 시간</div>
-      </div>
+      <div class="result-stat rc"><div class="result-stat-num" id="correctCount">0</div><div class="result-stat-label">정답</div></div>
+      <div class="result-stat rw"><div class="result-stat-num" id="wrongCount">0</div><div class="result-stat-label">오답</div></div>
+      <div class="result-stat rt"><div class="result-stat-num" id="avgTime">0s</div><div class="result-stat-label">평균 시간</div></div>
     </div>
-
     <button class="retry-btn" onclick="retryGame()">다시 도전하기 🔄</button>
     <button class="share-btn" onclick="shareResult()">결과 공유하기 📤</button>
   </div>
-
 </div>
 
 <script>
-let selectedCat = '일반상식';
-let questions = [];
-let currentQ = 0;
-let score = 0;
-let correctAnswers = 0;
-let timerInterval = null;
-let timeLeft = 20;
-let totalTime = 0;
-let questionStartTime = 0;
-let answered = false;
-
-const LABELS = ['①', '②', '③', '④'];
-
-function selectCat(el) {
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedCat = el.dataset.cat;
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-async function startGame() {
-  const btn = document.getElementById('startBtn');
-  btn.disabled = true;
-  showScreen('loading');
-
-  try {
-    questions = await fetchQuestions(selectedCat);
-    currentQ = 0;
-    score = 0;
-    correctAnswers = 0;
-    totalTime = 0;
-    showScreen('game');
-    renderQuestion();
-  } catch(e) {
-    showScreen('intro');
-    btn.disabled = false;
-    alert('퀴즈를 불러오지 못했어요. 다시 시도해주세요!\n' + e.message);
-  }
-}
-
-async function fetchQuestions(category) {
-  const prompt = `당신은 재미있는 퀴즈 출제자입니다. "${category}" 카테고리의 일반상식 퀴즈 10문제를 만들어주세요.
-
-반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트나 마크다운 없이 순수 JSON만 출력하세요:
-
-{
-  "questions": [
-    {
-      "question": "문제 텍스트",
-      "options": ["보기1", "보기2", "보기3", "보기4"],
-      "answer": 0,
-      "explanation": "간단한 해설 (1-2문장)"
-    }
+const Q = {
+  "일반상식": [
+    {q:"대한민국의 수도는?",o:["서울","부산","대구","인천"],a:0,e:"서울은 조선 시대부터 600년 이상 수도였어요."},
+    {q:"태양계에서 가장 큰 행성은?",o:["토성","목성","천왕성","해왕성"],a:1,e:"목성은 지구의 약 1,300배 크기를 가진 태양계 최대 행성이에요."},
+    {q:"세계에서 가장 긴 강은?",o:["아마존강","나일강","양쯔강","미시시피강"],a:1,e:"나일강은 약 6,650km로 세계에서 가장 긴 강이에요."},
+    {q:"다이아몬드의 주성분은?",o:["규소","탄소","알루미늄","철"],a:1,e:"다이아몬드는 순수한 탄소(C)로 이루어진 가장 단단한 천연 물질이에요."},
+    {q:"인체에서 가장 큰 장기는?",o:["간","폐","피부","심장"],a:2,e:"피부는 성인 기준 약 1.5~2m²로 인체에서 가장 큰 장기예요."},
+    {q:"빛의 속도는 약 얼마인가요?",o:["초속 30만km","초속 3만km","초속 300km","초속 30km"],a:0,e:"빛은 진공에서 초속 약 299,792km로 이동해요."},
+    {q:"세계에서 가장 높은 산은?",o:["K2","에베레스트","칸첸중가","마칼루"],a:1,e:"에베레스트(8,849m)는 세계 최고봉으로 히말라야 산맥에 있어요."},
+    {q:"원소 기호 'Au'는 무엇인가요?",o:["은","금","구리","알루미늄"],a:1,e:"Au는 라틴어 Aurum에서 유래한 금의 원소 기호예요."},
+    {q:"세계에서 인구가 가장 많은 나라는?",o:["중국","인도","미국","인도네시아"],a:1,e:"2023년 기준 인도가 약 14.3억 명으로 세계 1위가 됐어요."},
+    {q:"물의 화학식은?",o:["CO2","H2O","NaCl","O2"],a:1,e:"물은 수소(H) 2개와 산소(O) 1개로 이루어진 H₂O예요."},
+    {q:"컴퓨터에서 1GB는 몇 MB인가요?",o:["100MB","512MB","1024MB","2048MB"],a:2,e:"1GB = 1,024MB예요."},
+    {q:"피카소의 국적은?",o:["프랑스","이탈리아","스페인","포르투갈"],a:2,e:"파블로 피카소는 스페인 말라가 출신이에요."},
+    {q:"올림픽은 몇 년마다 열리나요?",o:["2년","3년","4년","5년"],a:2,e:"하계·동계 올림픽 모두 4년마다 개최돼요."},
+    {q:"DNA 이중나선 구조를 발견한 사람은?",o:["아인슈타인","왓슨과 크릭","파스퇴르","다윈"],a:1,e:"1953년 왓슨과 크릭이 DNA 이중나선 구조를 발견해 노벨상을 받았어요."},
+    {q:"셰익스피어의 4대 비극이 아닌 것은?",o:["햄릿","맥베스","오셀로","로미오와 줄리엣"],a:3,e:"로미오와 줄리엣은 4대 비극(햄릿·오셀로·맥베스·리어왕)에 포함되지 않아요."}
+  ],
+  "과학": [
+    {q:"중력가속도는 약 얼마인가요?",o:["6.8m/s²","9.8m/s²","12.8m/s²","3.8m/s²"],a:1,e:"지구 표면에서의 중력가속도는 약 9.8m/s²예요."},
+    {q:"원자핵을 구성하는 입자는?",o:["전자와 중성자","양성자와 전자","양성자와 중성자","쿼크와 렙톤"],a:2,e:"원자핵은 양성자(+전하)와 중성자(전하없음)로 구성돼요."},
+    {q:"주기율표에서 원소를 배열하는 기준은?",o:["원자량","원자번호","전자수","밀도"],a:1,e:"현대 주기율표는 원자번호(양성자 수) 순서로 원소를 배열해요."},
+    {q:"소리의 속도가 가장 빠른 매질은?",o:["공기","물","고체","진공"],a:2,e:"소리는 고체 > 액체 > 기체 순으로 빠르게 전달돼요."},
+    {q:"태양의 에너지원은?",o:["핵분열","핵융합","화학반응","전자기반응"],a:1,e:"태양은 수소 원자핵이 융합해 헬륨이 되는 핵융합 반응으로 에너지를 만들어요."},
+    {q:"pH 7은 무엇을 의미하나요?",o:["강산성","약산성","중성","강알칼리성"],a:2,e:"pH 7은 중성, 7 미만은 산성, 7 초과는 염기성이에요."},
+    {q:"빛의 삼원색은?",o:["빨강·노랑·파랑","빨강·초록·파랑","빨강·주황·보라","청록·자홍·노랑"],a:1,e:"빛의 삼원색은 Red·Green·Blue(RGB)예요."},
+    {q:"뉴턴의 운동 제1법칙은?",o:["관성의 법칙","가속도의 법칙","작용반작용의 법칙","만유인력의 법칙"],a:0,e:"제1법칙은 관성의 법칙: 외력이 없으면 물체는 현재 운동 상태를 유지해요."},
+    {q:"DNA를 구성하는 염기가 아닌 것은?",o:["아데닌","구아닌","우라실","시토신"],a:2,e:"우라실(U)은 RNA의 염기예요. DNA는 아데닌·구아닌·시토신·티민으로 구성돼요."},
+    {q:"절대영도는 몇 °C인가요?",o:["-100°C","-173°C","-273°C","-373°C"],a:2,e:"절대영도는 -273.15°C(0K)로 이론적으로 가장 낮은 온도예요."},
+    {q:"세포의 에너지 공장이라 불리는 세포소기관은?",o:["핵","리보솜","미토콘드리아","골지체"],a:2,e:"미토콘드리아는 ATP(에너지)를 생산해 '세포의 발전소'라 불려요."},
+    {q:"지구 대기의 약 78%를 차지하는 기체는?",o:["산소","이산화탄소","질소","아르곤"],a:2,e:"지구 대기는 질소 약 78%, 산소 약 21%로 구성돼요."},
+    {q:"전자기파 중 파장이 가장 짧은 것은?",o:["전파","적외선","자외선","감마선"],a:3,e:"감마선의 파장은 0.01nm 이하로 전자기파 중 가장 짧아요."},
+    {q:"광합성 결과 생성되는 것이 아닌 것은?",o:["포도당","산소","이산화탄소","물"],a:2,e:"광합성은 CO₂+H₂O+빛 → 포도당+O₂예요. 이산화탄소는 소모됩니다."},
+    {q:"빛이 물에서 꺾이는 현상은?",o:["반사","굴절","회절","산란"],a:1,e:"굴절은 빛이 서로 다른 매질을 통과할 때 속도가 변해 방향이 꺾이는 현상이에요."}
+  ],
+  "역사": [
+    {q:"한국전쟁이 시작된 연도는?",o:["1945년","1948년","1950년","1953년"],a:2,e:"한국전쟁은 1950년 6월 25일 북한의 남침으로 시작됐어요."},
+    {q:"조선을 건국한 인물은?",o:["왕건","이성계","이순신","세종대왕"],a:1,e:"이성계(태조)가 1392년 고려를 멸하고 조선을 건국했어요."},
+    {q:"세계 2차대전이 끝난 연도는?",o:["1943년","1944년","1945년","1946년"],a:2,e:"1945년 5월 독일, 8월 일본이 항복하며 2차 세계대전이 종료됐어요."},
+    {q:"훈민정음을 창제한 왕은?",o:["태조","태종","세종","성종"],a:2,e:"세종대왕이 1443년 훈민정음(한글)을 창제해 1446년 반포했어요."},
+    {q:"프랑스 혁명이 일어난 연도는?",o:["1776년","1789년","1804년","1815년"],a:1,e:"1789년 바스티유 감옥 습격으로 프랑스 혁명이 시작됐어요."},
+    {q:"콜럼버스가 아메리카에 도달한 연도는?",o:["1388년","1415년","1492년","1522년"],a:2,e:"크리스토퍼 콜럼버스는 1492년 10월 12일 카리브해 섬에 도달했어요."},
+    {q:"임진왜란을 일으킨 일본 장군은?",o:["도쿠가와 이에야스","오다 노부나가","도요토미 히데요시","사이고 다카모리"],a:2,e:"1592년 도요토미 히데요시의 명으로 일본군이 조선을 침략했어요."},
+    {q:"베를린 장벽이 무너진 연도는?",o:["1985년","1987년","1989년","1991년"],a:2,e:"1989년 11월 9일 베를린 장벽이 붕괴되며 독일 통일의 기반이 마련됐어요."},
+    {q:"조선의 임금 중 가장 긴 재위 기간을 가진 왕은?",o:["세종","영조","숙종","고종"],a:1,e:"영조는 1724~1776년까지 52년간 재위해 조선 최장 재위 기록을 보유해요."},
+    {q:"러시아 혁명이 일어난 연도는?",o:["1905년","1914년","1917년","1921년"],a:2,e:"1917년 볼셰비키 혁명으로 레닌이 이끄는 소비에트 정권이 수립됐어요."},
+    {q:"광개토대왕이 속한 나라는?",o:["고구려","백제","신라","가야"],a:0,e:"광개토대왕(374~413)은 고구려의 왕으로 영토를 크게 확장했어요."},
+    {q:"만리장성을 처음 쌓은 황제는?",o:["한 고조","진시황","당 태종","원 세조"],a:1,e:"진시황이 기원전 221년 통일 후 북방 방어를 위해 만리장성을 연결·확장했어요."},
+    {q:"한글날은 몇 월 몇 일인가요?",o:["9월 9일","10월 3일","10월 9일","11월 3일"],a:2,e:"한글날은 훈민정음 반포를 기념해 10월 9일로 지정됐어요."},
+    {q:"일제강점기가 끝난 연도는?",o:["1943년","1944년","1945년","1946년"],a:2,e:"1945년 8월 15일 일본의 항복으로 광복을 맞이해 일제강점기가 끝났어요."},
+    {q:"이집트 최대 피라미드의 이름은?",o:["카프레","멘카우레","쿠푸","조세르"],a:2,e:"기자의 대피라미드(쿠푸 왕 피라미드)는 높이 146m로 세계 최대예요."}
+  ],
+  "스포츠": [
+    {q:"축구 월드컵은 몇 년마다 열리나요?",o:["2년","3년","4년","5년"],a:2,e:"FIFA 월드컵은 4년마다 개최되며 1930년 우루과이에서 첫 대회가 열렸어요."},
+    {q:"마라톤의 공식 거리는?",o:["40km","41.195km","42.195km","43km"],a:2,e:"마라톤 공식 거리는 42.195km로 1908년 런던 올림픽에서 확정됐어요."},
+    {q:"테니스에서 서브가 두 번 모두 실패하면?",o:["레트","폴트","더블폴트","에이스"],a:2,e:"더블폴트: 두 번의 서브가 모두 실패해 상대에게 점수가 주어져요."},
+    {q:"올림픽 오륜기의 색이 아닌 것은?",o:["파랑","노랑","보라","검정"],a:2,e:"오륜기는 파랑·노랑·검정·초록·빨강 5색으로 5대륙을 상징해요."},
+    {q:"볼링에서 3연속 스트라이크는?",o:["터키","스페어","퍼펙트","더블"],a:0,e:"볼링에서 3연속 스트라이크를 '터키(Turkey)'라고 해요."},
+    {q:"FIFA 월드컵 최다 우승 국가는?",o:["독일","아르헨티나","브라질","이탈리아"],a:2,e:"브라질은 1958·62·70·94·2002년 총 5회 우승해 최다 우승국이에요."},
+    {q:"배드민턴에서 셔틀콕의 깃털은 몇 개인가요?",o:["12개","14개","16개","18개"],a:2,e:"배드민턴 셔틀콕에는 16개의 깃털이 사용돼요."},
+    {q:"농구를 발명한 사람은?",o:["제임스 네이스미스","월터 캠프","에이브너 더블데이","찰스 굿이어"],a:0,e:"1891년 캐나다인 체육교사 제임스 네이스미스가 농구를 발명했어요."},
+    {q:"태권도의 발상지 국가는?",o:["중국","일본","한국","북한"],a:2,e:"태권도는 한국의 전통 무예에서 발전한 스포츠로 2000년 올림픽 정식 종목이 됐어요."},
+    {q:"테니스 4대 그랜드슬램 대회가 아닌 것은?",o:["윔블던","US오픈","마스터스","호주오픈"],a:2,e:"마스터스는 골프 대회예요. 테니스 그랜드슬램은 호주·프랑스·윔블던·US오픈이에요."},
+    {q:"배구 한 팀의 코트 선수 수는?",o:["5명","6명","7명","9명"],a:1,e:"배구는 한 팀에 6명이 코트에 서요."},
+    {q:"수영에서 접영을 영어로?",o:["backstroke","breaststroke","freestyle","butterfly"],a:3,e:"접영은 butterfly stroke이에요. 두 팔을 동시에 뻗는 동작이 나비를 닮았어요."},
+    {q:"농구 경기 쿼터 수는?",o:["2쿼터","3쿼터","4쿼터","5쿼터"],a:2,e:"농구는 4쿼터로 진행되며 NBA 기준 각 쿼터는 12분이에요."},
+    {q:"야구에서 타자가 한 경기에 4타석 연속 홈런을 치면?",o:["사이클링 히트","퍼펙트 게임","사이클 히트","4연속 홈런"],a:3,e:"한 경기 4연속 홈런은 매우 희귀한 기록이에요."},
+    {q:"피겨스케이팅에서 가장 어려운 점프 중 하나는?",o:["루프","플립","악셀","토루프"],a:2,e:"악셀(Axel)은 전진으로 도약해 1.5회전 이상 회전하는 유일한 점프로 가장 어렵게 여겨져요."}
+  ],
+  "음식/문화": [
+    {q:"김치의 주재료가 아닌 것은?",o:["배추","고추가루","마늘","된장"],a:3,e:"김치의 기본 재료는 배추·고춧가루·마늘·생강·젓갈 등이에요."},
+    {q:"스시(초밥)의 발원지 국가는?",o:["중국","일본","한국","태국"],a:1,e:"스시는 에도 시대(19세기) 일본 도쿄에서 길거리 음식으로 시작됐어요."},
+    {q:"피자의 발원지 국가는?",o:["미국","스페인","이탈리아","프랑스"],a:2,e:"피자는 이탈리아 나폴리에서 유래했으며 1889년 마르게리타 피자가 탄생했어요."},
+    {q:"두부의 주원료는?",o:["쌀","밀","콩","옥수수"],a:2,e:"두부는 콩을 갈아 응고시켜 만든 식품으로 단백질이 풍부해요."},
+    {q:"라면의 발명 국가는?",o:["한국","중국","일본","대만"],a:2,e:"1958년 일본의 안도 모모후쿠가 최초의 인스턴트 라면 '치킨라면'을 발명했어요."},
+    {q:"초콜릿의 원재료 카카오의 원산지 대륙은?",o:["아시아","아프리카","중남미","유럽"],a:2,e:"카카오나무는 중앙·남아메리카가 원산지이며 마야 문명에서 음료로 사용됐어요."},
+    {q:"설날에 먹는 전통 음식은?",o:["송편","떡국","삼계탕","비빔밥"],a:1,e:"설날(음력 1월 1일)에는 흰 떡국을 먹으며 한 살 더 먹는다는 의미가 있어요."},
+    {q:"추석에 먹는 전통 음식은?",o:["송편","떡국","삼계탕","약식"],a:0,e:"추석(음력 8월 15일)에는 햅쌀과 햇곡식으로 만든 송편을 먹어요."},
+    {q:"된장은 무엇을 발효시켜 만드나요?",o:["쌀","보리","콩","고구마"],a:2,e:"된장은 메주콩(대두)으로 메주를 만들어 소금물에 발효시킨 한국 전통 발효식품이에요."},
+    {q:"전통 한복에서 여성이 착용하는 상의는?",o:["치마","저고리","두루마기","쾌자"],a:1,e:"저고리는 한복의 상의로, 여성용은 짧고 남성용은 길어요."},
+    {q:"이탈리아 음식 카르보나라의 정통 재료가 아닌 것은?",o:["달걀","파마산 치즈","판체타","생크림"],a:3,e:"정통 카르보나라는 달걀·파마산·판체타·흑후추로 만들며 생크림은 들어가지 않아요."},
+    {q:"커피의 3대 원종이 아닌 것은?",o:["아라비카","로부스타","리베리카","블루마운틴"],a:3,e:"커피 3대 원종은 아라비카·로부스타(카네포라)·리베리카예요."},
+    {q:"포도주(와인)는 주로 어떤 과일로 만드나요?",o:["사과","복숭아","포도","딸기"],a:2,e:"와인은 포도를 발효시켜 만들며, 적포도주·백포도주·로제 등으로 나뉘어요."},
+    {q:"중국 4대 요리에 속하지 않는 것은?",o:["광둥요리","쓰촨요리","상하이요리","한국요리"],a:3,e:"중국 4대 요리는 베이징·광둥·쓰촨·상하이 요리예요."},
+    {q:"허니문이라는 단어의 유래는?",o:["꿀색 달","첫 달에 꿀술 마시기","달콤한 여행","태양과 달의 만남"],a:1,e:"중세 유럽에서 결혼 후 첫 달(moon) 동안 꿀술(mead)을 마시는 풍습에서 유래했어요."}
+  ],
+  "지리": [
+    {q:"세계에서 가장 큰 대륙은?",o:["아프리카","북아메리카","아시아","남아메리카"],a:2,e:"아시아는 약 4,400만km²로 전 세계 육지의 약 30%를 차지하는 최대 대륙이에요."},
+    {q:"대한민국의 가장 큰 섬은?",o:["거제도","강화도","제주도","울릉도"],a:2,e:"제주도는 면적 약 1,845km²로 대한민국에서 가장 큰 섬이에요."},
+    {q:"세계에서 가장 큰 나라(면적)는?",o:["중국","캐나다","미국","러시아"],a:3,e:"러시아는 약 1,710만km²로 세계 최대 면적의 국가예요."},
+    {q:"사하라 사막이 위치한 대륙은?",o:["아시아","오세아니아","아프리카","남아메리카"],a:2,e:"사하라 사막은 아프리카 북부에 위치하며 세계 최대의 열사막이에요."},
+    {q:"적도가 지나지 않는 대륙은?",o:["아프리카","아시아","남아메리카","유럽"],a:3,e:"적도(0°)는 아프리카·아시아·남아메리카를 통과하지만 유럽은 통과하지 않아요."},
+    {q:"나이아가라 폭포가 위치한 두 나라는?",o:["미국·캐나다","미국·멕시코","캐나다·영국","미국·영국"],a:0,e:"나이아가라 폭포는 미국(뉴욕주)과 캐나다(온타리오주) 국경에 위치해요."},
+    {q:"알프스 산맥이 걸쳐있지 않은 나라는?",o:["스위스","오스트리아","노르웨이","이탈리아"],a:2,e:"알프스는 프랑스·스위스·오스트리아·이탈리아 등을 통과하지만 노르웨이는 아니에요."},
+    {q:"세계에서 가장 작은 나라는?",o:["모나코","산마리노","바티칸","나우루"],a:2,e:"바티칸 시국은 면적 약 0.44km²로 세계 최소 국가예요."},
+    {q:"동남아시아 국가가 아닌 것은?",o:["베트남","태국","방글라데시","필리핀"],a:2,e:"방글라데시는 남아시아 국가예요."},
+    {q:"세계에서 가장 깊은 호수는?",o:["카스피해","슈피리어호","바이칼호","탄가니카호"],a:2,e:"러시아의 바이칼 호수는 최대 수심 1,642m로 세계에서 가장 깊은 호수예요."},
+    {q:"태평양과 대서양을 연결하는 운하는?",o:["수에즈 운하","파나마 운하","킬 운하","코린트 운하"],a:1,e:"파나마 운하는 중앙아메리카 파나마를 가로질러 태평양과 대서양을 연결해요."},
+    {q:"우리나라 동쪽 끝 섬은?",o:["제주도","독도","거제도","울릉도"],a:1,e:"독도(동경 131°52')는 대한민국 영토의 최동단에 위치해요."},
+    {q:"아마존 열대우림이 주로 위치한 나라는?",o:["콜롬비아","볼리비아","브라질","페루"],a:2,e:"아마존의 약 60%는 브라질 영토에 있으며 지구 산소의 20%를 공급해요."},
+    {q:"세계에서 가장 인구가 많은 도시권은?",o:["베이징","상하이","도쿄","뭄바이"],a:2,e:"도쿄 도시권은 약 3,700만 명으로 세계 최대 도시권이에요."},
+    {q:"지중해와 홍해를 연결하는 운하는?",o:["파나마 운하","수에즈 운하","킬 운하","코린트 운하"],a:1,e:"수에즈 운하는 이집트에 위치하며 지중해와 홍해(인도양)를 연결해요."}
   ]
-}
+};
 
-규칙:
-- answer는 정답 보기의 인덱스 (0~3)
-- 문제는 명확하고 재미있게
-- 난이도는 쉬움~보통~어려움 골고루
-- 한국어로 작성
-- 설명은 왜 그게 정답인지 간단히`;
+const CATS = [
+  {key:"일반상식",icon:"🌍"},{key:"과학",icon:"🔬"},
+  {key:"역사",icon:"🏛️"},{key:"스포츠",icon:"⚽"},
+  {key:"음식/문화",icon:"🍜"},{key:"지리",icon:"🗺️"}
+];
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }]
-    })
+let selCat="일반상식", questions=[], curQ=0, score=0, correct=0, timer=null, timeLeft=20, totalTime=0, qStart=0, answered=false;
+const LABELS=['①','②','③','④'];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+
+function init(){
+  const grid=document.getElementById('catGrid');
+  CATS.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='cat-btn'+(c.key===selCat?' selected':'');
+    btn.dataset.cat=c.key;
+    btn.innerHTML=`<span class="cat-icon">${c.icon}</span><span class="cat-name">${c.key}</span><span class="cat-count">${Q[c.key].length}문제 보유</span>`;
+    btn.onclick=()=>{document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selCat=c.key;};
+    grid.appendChild(btn);
   });
-
-  if (!res.ok) throw new Error('API 오류: ' + res.status);
-  const data = await res.json();
-  const text = data.content.map(c => c.text || '').join('');
-  const clean = text.replace(/```json|```/g, '').trim();
-  const parsed = JSON.parse(clean);
-  return parsed.questions;
 }
 
-function renderQuestion() {
-  const q = questions[currentQ];
-  answered = false;
+function startGame(){
+  questions=shuffle(Q[selCat]).slice(0,10);
+  curQ=0;score=0;correct=0;totalTime=0;
+  showScreen('game');renderQuestion();
+}
 
-  document.getElementById('qCounter').textContent = `${currentQ + 1} / ${questions.length}`;
-  document.getElementById('progressFill').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
-  document.getElementById('qCatTag').textContent = selectedCat;
-  document.getElementById('questionText').textContent = q.question;
-  document.getElementById('scoreDisplay').textContent = score;
-
-  const area = document.getElementById('optionsArea');
-  area.innerHTML = '';
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn';
-    btn.innerHTML = `<span class="option-num">${LABELS[i]}</span><span>${opt}</span>`;
-    btn.onclick = () => selectAnswer(i, btn);
+function renderQuestion(){
+  const q=questions[curQ];answered=false;
+  document.getElementById('qCounter').textContent=`${curQ+1} / ${questions.length}`;
+  document.getElementById('progressFill').style.width=`${((curQ+1)/questions.length)*100}%`;
+  document.getElementById('qCatTag').textContent=selCat;
+  document.getElementById('questionText').textContent=q.q;
+  document.getElementById('scoreDisplay').textContent=score;
+  const area=document.getElementById('optionsArea');area.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='option-btn';
+    btn.innerHTML=`<span class="option-num">${LABELS[i]}</span><span>${opt}</span>`;
+    btn.onclick=()=>pick(i,btn);
     area.appendChild(btn);
   });
-
-  const fb = document.getElementById('feedbackBar');
-  fb.style.display = 'none';
-  fb.className = 'feedback-bar';
-
-  startTimer();
-  questionStartTime = Date.now();
+  document.getElementById('feedbackBar').style.display='none';
+  document.getElementById('feedbackBar').className='feedback-bar';
+  startTimer();qStart=Date.now();
 }
 
-function startTimer() {
-  clearInterval(timerInterval);
-  timeLeft = 20;
-  updateTimerUI();
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerUI();
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      if (!answered) timeUp();
-    }
-  }, 1000);
+function startTimer(){
+  clearInterval(timer);timeLeft=20;updateTimer();
+  timer=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timer);if(!answered)timeUp();}},1000);
 }
 
-function updateTimerUI() {
-  const pct = (timeLeft / 20) * 100;
-  const fill = document.getElementById('timerFill');
-  const num = document.getElementById('timerNum');
-  fill.style.width = pct + '%';
-  num.textContent = timeLeft;
-  fill.className = 'timer-fill' + (timeLeft <= 5 ? ' danger' : timeLeft <= 10 ? ' warn' : '');
+function updateTimer(){
+  const p=(timeLeft/20)*100;
+  const f=document.getElementById('timerFill');
+  f.style.width=p+'%';
+  document.getElementById('timerNum').textContent=timeLeft;
+  f.className='timer-fill'+(timeLeft<=5?' danger':timeLeft<=10?' warn':'');
 }
 
-function timeUp() {
-  answered = true;
-  const q = questions[currentQ];
-  const elapsed = (Date.now() - questionStartTime) / 1000;
-  totalTime += elapsed;
-
-  document.querySelectorAll('.option-btn').forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === q.answer) btn.classList.add('correct');
-  });
-
-  showFeedback(false, '시간 초과!', '⏰ 시간이 다 됐어요! ' + (q.explanation || ''));
+function timeUp(){
+  answered=true;totalTime+=(Date.now()-qStart)/1000;
+  const q=questions[curQ];
+  document.querySelectorAll('.option-btn').forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');});
+  showFb(false,'⏰ 시간 초과!','정답: '+q.o[q.a]+' | '+q.e);
 }
 
-function selectAnswer(idx, btn) {
-  if (answered) return;
-  answered = true;
-  clearInterval(timerInterval);
-
-  const q = questions[currentQ];
-  const elapsed = (Date.now() - questionStartTime) / 1000;
-  totalTime += elapsed;
-
-  const isCorrect = idx === q.answer;
-
-  document.querySelectorAll('.option-btn').forEach((b, i) => {
-    b.disabled = true;
-    if (i === q.answer) b.classList.add('correct');
-  });
-
-  if (!isCorrect) {
-    btn.classList.add('wrong');
-  }
-
-  if (isCorrect) {
-    correctAnswers++;
-    const timeBonus = Math.round((timeLeft / 20) * 50);
-    score += 100 + timeBonus;
-    showFeedback(true, '정답이에요! 🎊', `+${100 + timeBonus}점 | ` + (q.explanation || ''));
-  } else {
-    showFeedback(false, '아쉬워요...', '정답: ' + q.options[q.answer] + ' | ' + (q.explanation || ''));
-  }
-
-  document.getElementById('scoreDisplay').textContent = score;
+function pick(idx,btn){
+  if(answered)return;answered=true;clearInterval(timer);
+  totalTime+=(Date.now()-qStart)/1000;
+  const q=questions[curQ];const ok=idx===q.a;
+  document.querySelectorAll('.option-btn').forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');});
+  if(!ok)btn.classList.add('wrong');
+  if(ok){correct++;const bonus=Math.round((timeLeft/20)*50);score+=100+bonus;showFb(true,`정답이에요! 🎊 +${100+bonus}점`,q.e);}
+  else{showFb(false,'아쉬워요! ❌','정답: '+q.o[q.a]+' | '+q.e);}
+  document.getElementById('scoreDisplay').textContent=score;
 }
 
-function showFeedback(correct, title, explain) {
-  const fb = document.getElementById('feedbackBar');
-  fb.className = 'feedback-bar ' + (correct ? 'correct-fb' : 'wrong-fb');
-  document.getElementById('feedbackIcon').textContent = correct ? '✅' : '❌';
-  document.getElementById('feedbackTitle').textContent = title;
-  document.getElementById('feedbackExplain').textContent = explain;
-  document.getElementById('nextBtn').textContent = currentQ >= questions.length - 1 ? '결과 보기 🏆' : '다음 문제 →';
-  fb.style.display = 'flex';
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function showFb(ok,title,explain){
+  const fb=document.getElementById('feedbackBar');
+  fb.className='feedback-bar '+(ok?'correct-fb':'wrong-fb');
+  document.getElementById('feedbackIcon').textContent=ok?'✅':'❌';
+  document.getElementById('feedbackTitle').textContent=title;
+  document.getElementById('feedbackExplain').textContent=explain;
+  document.getElementById('nextBtn').textContent=curQ>=questions.length-1?'결과 보기 🏆':'다음 문제 →';
+  fb.style.display='flex';fb.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function nextQuestion() {
-  currentQ++;
-  if (currentQ >= questions.length) {
-    showResult();
-  } else {
-    renderQuestion();
-    window.scrollTo(0, 0);
-  }
+function nextQuestion(){
+  curQ++;
+  if(curQ>=questions.length)showResult();
+  else{renderQuestion();window.scrollTo(0,0);}
 }
 
-function showResult() {
+function showResult(){
   showScreen('result');
-  const pct = Math.round((correctAnswers / questions.length) * 100);
-  const avgT = Math.round(totalTime / questions.length);
-
-  document.getElementById('scoreCircle').style.setProperty('--pct', pct);
-  document.getElementById('finalScore').textContent = score;
-  document.getElementById('correctCount').textContent = correctAnswers;
-  document.getElementById('wrongCount').textContent = questions.length - correctAnswers;
-  document.getElementById('avgTime').textContent = avgT + 's';
-
-  let emoji, title, sub, grade, gradeBg, gradeColor;
-  if (pct >= 90) {
-    emoji = '🏆'; title = '천재 등장!'; sub = '완벽에 가까운 점수예요!';
-    grade = '🥇 천재'; gradeBg = 'rgba(255,217,61,0.15)'; gradeColor = '#ffd93d';
-  } else if (pct >= 70) {
-    emoji = '🎉'; title = '대단해요!'; sub = '매우 훌륭한 결과예요!';
-    grade = '🥈 우등생'; gradeBg = 'rgba(107,203,119,0.15)'; gradeColor = '#6bcb77';
-  } else if (pct >= 50) {
-    emoji = '👍'; title = '잘했어요!'; sub = '조금만 더 연습하면 완벽!';
-    grade = '🥉 도전자'; gradeBg = 'rgba(77,150,255,0.15)'; gradeColor = '#4d96ff';
-  } else {
-    emoji = '💪'; title = '다시 도전!'; sub = '포기하지 마세요! 파이팅!';
-    grade = '📚 공부중'; gradeBg = 'rgba(167,169,190,0.15)'; gradeColor = '#a7a9be';
-  }
-
-  document.getElementById('resultEmoji').textContent = emoji;
-  document.getElementById('resultTitle').textContent = title;
-  document.getElementById('resultSub').textContent = sub;
-  const gb = document.getElementById('gradeBadge');
-  gb.textContent = grade;
-  gb.style.background = gradeBg;
-  gb.style.color = gradeColor;
-  gb.style.border = `1px solid ${gradeColor}`;
+  const pct=Math.round((correct/questions.length)*100);
+  const avgT=Math.round(totalTime/questions.length);
+  document.getElementById('scoreCircle').style.setProperty('--pct',pct);
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('correctCount').textContent=correct;
+  document.getElementById('wrongCount').textContent=questions.length-correct;
+  document.getElementById('avgTime').textContent=avgT+'s';
+  let emoji,title,sub,grade,gbg,gc;
+  if(pct>=90){emoji='🏆';title='천재 등장!';sub='완벽에 가까운 점수예요!';grade='🥇 천재';gbg='rgba(255,217,61,0.15)';gc='#ffd93d';}
+  else if(pct>=70){emoji='🎉';title='대단해요!';sub='매우 훌륭한 결과예요!';grade='🥈 우등생';gbg='rgba(107,203,119,0.15)';gc='#6bcb77';}
+  else if(pct>=50){emoji='👍';title='잘했어요!';sub='조금만 더 연습하면 완벽!';grade='🥉 도전자';gbg='rgba(77,150,255,0.15)';gc='#4d96ff';}
+  else{emoji='💪';title='다시 도전!';sub='포기하지 마세요! 파이팅!';grade='📚 공부중';gbg='rgba(167,169,190,0.15)';gc='#a7a9be';}
+  document.getElementById('resultEmoji').textContent=emoji;
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultSub').textContent=sub;
+  const gb=document.getElementById('gradeBadge');
+  gb.textContent=grade;gb.style.background=gbg;gb.style.color=gc;gb.style.border=`1px solid ${gc}`;
 }
 
-function retryGame() {
-  showScreen('intro');
-  document.getElementById('startBtn').disabled = false;
+function retryGame(){showScreen('intro');}
+
+function shareResult(){
+  const text=`🧠 브레인 퀴즈\n📚 ${selCat} | ⭐ ${score}점\n✅ ${correct}/${questions.length} 정답\n\n도전해봐! 👉 https://sonkh200.github.io/kongegame/`;
+  if(navigator.share)navigator.share({title:'브레인 퀴즈',text});
+  else if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>alert('클립보드에 복사됐어요!'));
 }
 
-function shareResult() {
-  const text = `🧠 브레인 퀴즈\n📚 카테고리: ${selectedCat}\n⭐ ${score}점 | ✅ ${correctAnswers}/${questions.length} 정답\n\n나도 도전해봐!`;
-  if (navigator.share) {
-    navigator.share({ title: '브레인 퀴즈', text });
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => alert('결과가 클립보드에 복사됐어요!'));
-  }
-}
+init();
 </script>
 </body>
 </html>
