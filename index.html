@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🧠 브레인 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1828;
+    --card: #232136;
+    --accent: #ff6b6b;
+    --accent2: #ffd93d;
+    --accent3: #6bcb77;
+    --accent4: #4d96ff;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --border: rgba(255,255,255,0.08);
+    --correct: #6bcb77;
+    --wrong: #ff6b6b;
+    --glow: rgba(255,107,107,0.3);
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    position: relative;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; flex-direction: column; align-items: center; width: 100%; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ===== INTRO ===== */
+  #intro {
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: radial-gradient(ellipse at top, #2d1b69 0%, #0f0e17 60%);
+  }
+
+  .logo-area { text-align: center; margin-bottom: 2rem; }
+  .logo-emoji { font-size: 5rem; display: block; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+  .game-title {
+    font-family: 'Jua', cursive;
+    font-size: 2.8rem;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+  }
+
+  .tagline { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+  .stats-row {
+    display: flex; gap: 1rem; margin: 2rem 0; width: 100%;
+  }
+
+  .stat-card {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-num { font-family: 'Jua', cursive; font-size: 1.8rem; color: var(--accent2); }
+  .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .cat-btn {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 0.75rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+
+  .cat-btn:hover, .cat-btn.selected {
+    border-color: var(--accent2);
+    background: rgba(255,217,61,0.1);
+    transform: scale(1.03);
+  }
+
+  .cat-icon { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+  .cat-name { font-size: 0.85rem; font-weight: 700; }
+
+  .start-btn {
+    width: 100%;
+    padding: 1.1rem;
+    background: linear-gradient(135deg, var(--accent), #ff4757);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-family: 'Jua', cursive;
+    font-size: 1.3rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px var(--glow);
+  }
+
+  .start-btn:active { transform: scale(0.97); }
+  .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===== LOADING ===== */
+  #loading {
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--bg);
+  }
+
+  .loader-emoji { font-size: 4rem; animation: spin 1s linear infinite; }
+  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  .loader-text { font-family: 'Jua', cursive; font-size: 1.3rem; color: var(--accent2); text-align: center; }
+  .loader-sub { color: var(--muted); font-size: 0.85rem; text-align: center; }
+
+  /* ===== GAME ===== */
+  #game {
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .game-header {
+    width: 100%;
+    padding: 1rem 1.25rem 0.75rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+
+  .q-counter { font-family: 'Jua', cursive; font-size: 1rem; color: var(--muted); }
+  .score-badge {
+    font-family: 'Jua', cursive;
+    font-size: 1rem;
+    background: var(--card);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    color: var(--accent2);
+    border: 1px solid var(--border);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .timer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .timer-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .timer-fill {
+    height: 100%;
+    background: var(--accent3);
+    border-radius: 99px;
+    transition: width 1s linear, background 1s;
+  }
+
+  .timer-fill.warn { background: var(--accent2); }
+  .timer-fill.danger { background: var(--accent); }
+
+  .timer-num {
+    font-family: 'Jua', cursive;
+    font-size: 0.9rem;
+    min-width: 28px;
+    text-align: right;
+    color: var(--muted);
+  }
+
+  .question-area {
+    width: 100%;
+    padding: 1.5rem 1.25rem 1rem;
+  }
+
+  .q-category-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    background: rgba(77,150,255,0.15);
+    color: var(--accent4);
+    border: 1px solid rgba(77,150,255,0.3);
+    border-radius: 20px;
+    padding: 0.2rem 0.7rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .question-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .options-area {
+    width: 100%;
+    padding: 0 1.25rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .option-btn {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    transition: all 0.15s;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .option-btn:active:not(:disabled) { transform: scale(0.98); }
+  .option-btn:disabled { cursor: default; }
+
+  .option-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Jua', cursive;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .option-btn.selected { border-color: var(--accent4); background: rgba(77,150,255,0.1); }
+  .option-btn.selected .option-num { background: var(--accent4); border-color: var(--accent4); color: white; }
+
+  .option-btn.correct { border-color: var(--correct); background: rgba(107,203,119,0.12); }
+  .option-btn.correct .option-num { background: var(--correct); border-color: var(--correct); color: white; }
+
+  .option-btn.wrong { border-color: var(--wrong); background: rgba(255,107,107,0.1); }
+  .option-btn.wrong .option-num { background: var(--wrong); border-color: var(--wrong); color: white; }
+
+  /* ===== FEEDBACK ===== */
+  .feedback-bar {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: 0;
+    display: none;
+    align-items: flex-start;
+    gap: 0.75rem;
+    animation: slideUp 0.3s ease;
+    flex-direction: column;
+  }
+
+  @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .feedback-bar.correct-fb { background: rgba(107,203,119,0.12); border-top: 2px solid var(--correct); }
+  .feedback-bar.wrong-fb { background: rgba(255,107,107,0.1); border-top: 2px solid var(--wrong); }
+
+  .feedback-top { display: flex; align-items: center; gap: 0.5rem; }
+  .feedback-icon { font-size: 1.4rem; }
+  .feedback-title { font-family: 'Jua', cursive; font-size: 1.1rem; }
+  .feedback-bar.correct-fb .feedback-title { color: var(--correct); }
+  .feedback-bar.wrong-fb .feedback-title { color: var(--wrong); }
+
+  .feedback-explain { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  .next-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--accent4);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-family: 'Jua', cursive;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+  }
+
+  .next-btn:active { opacity: 0.8; }
+
+  /* ===== RESULT ===== */
+  #result {
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1.5rem;
+    background: radial-gradient(ellipse at center, #1a1030 0%, #0f0e17 60%);
+  }
+
+  .result-emoji { font-size: 5rem; margin-bottom: 1rem; animation: bounce 0.5s ease; }
+  @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+  .result-title { font-family: 'Jua', cursive; font-size: 2rem; margin-bottom: 0.25rem; }
+  .result-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .score-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent2) calc(var(--pct)*1%), var(--card) 0);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .score-inner {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+
+  .score-big { font-family: 'Jua', cursive; font-size: 2rem; color: var(--accent2); }
+  .score-total { font-size: 0.75rem; color: var(--muted); }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .result-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.85rem 0.5rem;
+    text-align: center;
+  }
+
+  .result-stat-num { font-family: 'Jua', cursive; font-size: 1.5rem; }
+  .result-stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  .result-correct .result-stat-num { color: var(--correct); }
+  .result-wrong .result-stat-num { color: var(--wrong); }
+  .result-time .result-stat-num { color: var(--accent4); }
+
+  .retry-btn {
+    width: 100%;
+    padding: 1.1rem;
+    background: linear-gradient(135deg, var(--accent), #ff4757);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-family: 'Jua', cursive;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--glow);
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .retry-btn:active { transform: scale(0.97); }
+
+  .share-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    color: var(--text);
+    font-family: 'Jua', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .grade-badge {
+    font-family: 'Jua', cursive;
+    font-size: 1rem;
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-box {
+    background: rgba(255,107,107,0.1);
+    border: 1px solid var(--wrong);
+    border-radius: 14px;
+    padding: 1rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 1rem 0;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== INTRO ===== -->
+  <div id="intro" class="screen active">
+    <div class="logo-area">
+      <span class="logo-emoji">🧠</span>
+      <div class="game-title">브레인 퀴즈</div>
+      <div class="tagline">AI가 만드는 나만의 퀴즈 도전!</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">10</div>
+        <div class="stat-label">문제 수</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">20</div>
+        <div class="stat-label">초 / 문제</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">4지</div>
+        <div class="stat-label">선다형</div>
+      </div>
+    </div>
+
+    <div style="width:100%;margin-bottom:0.75rem;font-family:'Jua',cursive;font-size:0.9rem;color:var(--muted);">카테고리 선택</div>
+    <div class="category-grid">
+      <button class="cat-btn selected" data-cat="일반상식" onclick="selectCat(this)">
+        <span class="cat-icon">🌍</span>
+        <span class="cat-name">일반상식</span>
+      </button>
+      <button class="cat-btn" data-cat="과학" onclick="selectCat(this)">
+        <span class="cat-icon">🔬</span>
+        <span class="cat-name">과학</span>
+      </button>
+      <button class="cat-btn" data-cat="역사" onclick="selectCat(this)">
+        <span class="cat-icon">🏛️</span>
+        <span class="cat-name">역사</span>
+      </button>
+      <button class="cat-btn" data-cat="스포츠" onclick="selectCat(this)">
+        <span class="cat-icon">⚽</span>
+        <span class="cat-name">스포츠</span>
+      </button>
+      <button class="cat-btn" data-cat="음식" onclick="selectCat(this)">
+        <span class="cat-icon">🍜</span>
+        <span class="cat-name">음식/문화</span>
+      </button>
+      <button class="cat-btn" data-cat="지리" onclick="selectCat(this)">
+        <span class="cat-icon">🗺️</span>
+        <span class="cat-name">지리</span>
+      </button>
+    </div>
+
+    <button class="start-btn" id="startBtn" onclick="startGame()">게임 시작하기 🚀</button>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div id="loading" class="screen">
+    <div class="loader-emoji">⚙️</div>
+    <div class="loader-text">AI가 퀴즈를 만들고 있어요!</div>
+    <div class="loader-sub">Claude가 열심히 문제를 생성 중...</div>
+  </div>
+
+  <!-- ===== GAME ===== -->
+  <div id="game" class="screen">
+    <div class="game-header">
+      <div class="progress-row">
+        <div class="q-counter" id="qCounter">1 / 10</div>
+        <div class="score-badge">⭐ <span id="scoreDisplay">0</span>점</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:10%"></div>
+      </div>
+      <div class="timer-row">
+        <div class="timer-bar">
+          <div class="timer-fill" id="timerFill"></div>
+        </div>
+        <div class="timer-num" id="timerNum">20</div>
+      </div>
+    </div>
+
+    <div class="question-area">
+      <div class="q-category-tag" id="qCatTag">일반상식</div>
+      <div class="question-text" id="questionText">문제를 불러오는 중...</div>
+    </div>
+
+    <div class="options-area" id="optionsArea"></div>
+
+    <div class="feedback-bar" id="feedbackBar">
+      <div class="feedback-top">
+        <span class="feedback-icon" id="feedbackIcon"></span>
+        <span class="feedback-title" id="feedbackTitle"></span>
+      </div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">다음 문제 →</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULT ===== -->
+  <div id="result" class="screen">
+    <div class="result-emoji" id="resultEmoji">🎉</div>
+    <div class="result-title" id="resultTitle">퀴즈 완료!</div>
+    <div class="result-sub" id="resultSub">결과를 확인해보세요</div>
+
+    <div class="grade-badge" id="gradeBadge"></div>
+
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-inner">
+        <div class="score-big" id="finalScore">0</div>
+        <div class="score-total">/ 1000점</div>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-stat result-correct">
+        <div class="result-stat-num" id="correctCount">0</div>
+        <div class="result-stat-label">정답</div>
+      </div>
+      <div class="result-stat result-wrong">
+        <div class="result-stat-num" id="wrongCount">0</div>
+        <div class="result-stat-label">오답</div>
+      </div>
+      <div class="result-stat result-time">
+        <div class="result-stat-num" id="avgTime">0s</div>
+        <div class="result-stat-label">평균 시간</div>
+      </div>
+    </div>
+
+    <button class="retry-btn" onclick="retryGame()">다시 도전하기 🔄</button>
+    <button class="share-btn" onclick="shareResult()">결과 공유하기 📤</button>
+  </div>
+
+</div>
+
+<script>
+let selectedCat = '일반상식';
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let correctAnswers = 0;
+let timerInterval = null;
+let timeLeft = 20;
+let totalTime = 0;
+let questionStartTime = 0;
+let answered = false;
+
+const LABELS = ['①', '②', '③', '④'];
+
+function selectCat(el) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = el.dataset.cat;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function startGame() {
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  showScreen('loading');
+
+  try {
+    questions = await fetchQuestions(selectedCat);
+    currentQ = 0;
+    score = 0;
+    correctAnswers = 0;
+    totalTime = 0;
+    showScreen('game');
+    renderQuestion();
+  } catch(e) {
+    showScreen('intro');
+    btn.disabled = false;
+    alert('퀴즈를 불러오지 못했어요. 다시 시도해주세요!\n' + e.message);
+  }
+}
+
+async function fetchQuestions(category) {
+  const prompt = `당신은 재미있는 퀴즈 출제자입니다. "${category}" 카테고리의 일반상식 퀴즈 10문제를 만들어주세요.
+
+반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트나 마크다운 없이 순수 JSON만 출력하세요:
+
+{
+  "questions": [
+    {
+      "question": "문제 텍스트",
+      "options": ["보기1", "보기2", "보기3", "보기4"],
+      "answer": 0,
+      "explanation": "간단한 해설 (1-2문장)"
+    }
+  ]
+}
+
+규칙:
+- answer는 정답 보기의 인덱스 (0~3)
+- 문제는 명확하고 재미있게
+- 난이도는 쉬움~보통~어려움 골고루
+- 한국어로 작성
+- 설명은 왜 그게 정답인지 간단히`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!res.ok) throw new Error('API 오류: ' + res.status);
+  const data = await res.json();
+  const text = data.content.map(c => c.text || '').join('');
+  const clean = text.replace(/```json|```/g, '').trim();
+  const parsed = JSON.parse(clean);
+  return parsed.questions;
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  answered = false;
+
+  document.getElementById('qCounter').textContent = `${currentQ + 1} / ${questions.length}`;
+  document.getElementById('progressFill').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+  document.getElementById('qCatTag').textContent = selectedCat;
+  document.getElementById('questionText').textContent = q.question;
+  document.getElementById('scoreDisplay').textContent = score;
+
+  const area = document.getElementById('optionsArea');
+  area.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-num">${LABELS[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i, btn);
+    area.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedbackBar');
+  fb.style.display = 'none';
+  fb.className = 'feedback-bar';
+
+  startTimer();
+  questionStartTime = Date.now();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 20;
+  updateTimerUI();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) timeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const pct = (timeLeft / 20) * 100;
+  const fill = document.getElementById('timerFill');
+  const num = document.getElementById('timerNum');
+  fill.style.width = pct + '%';
+  num.textContent = timeLeft;
+  fill.className = 'timer-fill' + (timeLeft <= 5 ? ' danger' : timeLeft <= 10 ? ' warn' : '');
+}
+
+function timeUp() {
+  answered = true;
+  const q = questions[currentQ];
+  const elapsed = (Date.now() - questionStartTime) / 1000;
+  totalTime += elapsed;
+
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add('correct');
+  });
+
+  showFeedback(false, '시간 초과!', '⏰ 시간이 다 됐어요! ' + (q.explanation || ''));
+}
+
+function selectAnswer(idx, btn) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+
+  const q = questions[currentQ];
+  const elapsed = (Date.now() - questionStartTime) / 1000;
+  totalTime += elapsed;
+
+  const isCorrect = idx === q.answer;
+
+  document.querySelectorAll('.option-btn').forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.answer) b.classList.add('correct');
+  });
+
+  if (!isCorrect) {
+    btn.classList.add('wrong');
+  }
+
+  if (isCorrect) {
+    correctAnswers++;
+    const timeBonus = Math.round((timeLeft / 20) * 50);
+    score += 100 + timeBonus;
+    showFeedback(true, '정답이에요! 🎊', `+${100 + timeBonus}점 | ` + (q.explanation || ''));
+  } else {
+    showFeedback(false, '아쉬워요...', '정답: ' + q.options[q.answer] + ' | ' + (q.explanation || ''));
+  }
+
+  document.getElementById('scoreDisplay').textContent = score;
+}
+
+function showFeedback(correct, title, explain) {
+  const fb = document.getElementById('feedbackBar');
+  fb.className = 'feedback-bar ' + (correct ? 'correct-fb' : 'wrong-fb');
+  document.getElementById('feedbackIcon').textContent = correct ? '✅' : '❌';
+  document.getElementById('feedbackTitle').textContent = title;
+  document.getElementById('feedbackExplain').textContent = explain;
+  document.getElementById('nextBtn').textContent = currentQ >= questions.length - 1 ? '결과 보기 🏆' : '다음 문제 →';
+  fb.style.display = 'flex';
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+}
+
+function showResult() {
+  showScreen('result');
+  const pct = Math.round((correctAnswers / questions.length) * 100);
+  const avgT = Math.round(totalTime / questions.length);
+
+  document.getElementById('scoreCircle').style.setProperty('--pct', pct);
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('correctCount').textContent = correctAnswers;
+  document.getElementById('wrongCount').textContent = questions.length - correctAnswers;
+  document.getElementById('avgTime').textContent = avgT + 's';
+
+  let emoji, title, sub, grade, gradeBg, gradeColor;
+  if (pct >= 90) {
+    emoji = '🏆'; title = '천재 등장!'; sub = '완벽에 가까운 점수예요!';
+    grade = '🥇 천재'; gradeBg = 'rgba(255,217,61,0.15)'; gradeColor = '#ffd93d';
+  } else if (pct >= 70) {
+    emoji = '🎉'; title = '대단해요!'; sub = '매우 훌륭한 결과예요!';
+    grade = '🥈 우등생'; gradeBg = 'rgba(107,203,119,0.15)'; gradeColor = '#6bcb77';
+  } else if (pct >= 50) {
+    emoji = '👍'; title = '잘했어요!'; sub = '조금만 더 연습하면 완벽!';
+    grade = '🥉 도전자'; gradeBg = 'rgba(77,150,255,0.15)'; gradeColor = '#4d96ff';
+  } else {
+    emoji = '💪'; title = '다시 도전!'; sub = '포기하지 마세요! 파이팅!';
+    grade = '📚 공부중'; gradeBg = 'rgba(167,169,190,0.15)'; gradeColor = '#a7a9be';
+  }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSub').textContent = sub;
+  const gb = document.getElementById('gradeBadge');
+  gb.textContent = grade;
+  gb.style.background = gradeBg;
+  gb.style.color = gradeColor;
+  gb.style.border = `1px solid ${gradeColor}`;
+}
+
+function retryGame() {
+  showScreen('intro');
+  document.getElementById('startBtn').disabled = false;
+}
+
+function shareResult() {
+  const text = `🧠 브레인 퀴즈\n📚 카테고리: ${selectedCat}\n⭐ ${score}점 | ✅ ${correctAnswers}/${questions.length} 정답\n\n나도 도전해봐!`;
+  if (navigator.share) {
+    navigator.share({ title: '브레인 퀴즈', text });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => alert('결과가 클립보드에 복사됐어요!'));
+  }
+}
+</script>
+</body>
+</html>
